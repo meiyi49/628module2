@@ -5,7 +5,8 @@
 
 2. For the code folder:
 	1. ***analysis.Rmd*** contains data-cleaning and model building code written for the project.
-	2. ***app.R*** contains Shiny base code. 
+	2. ***app.R*** contains Shiny base code. You can use the app from https://uw-madison-stat628-project2-mci.shinyapps.io/stat628_project2/. The package version shows below:
+		1.  shiny >= "1.9.1"
 
 3. For the image folder:
 	1. ***Age Distribution of Sample.png*** is a histogram plot showing the distribution of age from the raw data(***body_fat.csv***).
