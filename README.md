@@ -1,7 +1,7 @@
 1. For the data folder:
 	1. ***body_fat.csv*** contains the raw data.
 	2. ***qted.csv*** contains the cleaned data with corrected values for BODYFAT, HEIGHT, and ADIPOSITY.
-	3. ***world_2024.csv*** shows the body fat percentage by age in male and female from https://www.verywellhealth.com/body-fat-percentage-chart-8550202.
+	3. ***world_2024.csv*** shows the body fat percentage by age in male and female from https://population-pyramid.net/.
 
 2. For the code folder:
 	1. ***analysis.Rmd*** contains data-cleaning and model building code written for the project.
