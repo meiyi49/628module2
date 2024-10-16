@@ -135,9 +135,6 @@ write.table(qced_data,file='qced_data.csv',quote=F,row.names = F,col.names = T,s
 ## lasso
 
 ```{r}
-```
-
-```{r}
 set.seed(42)
 library(glmnet)
 X <- as.matrix(qced_data[, -c(1,2,3)]) 
@@ -333,5 +330,6 @@ qqline(residuals(forward_model_ols),col='red')
 library(car)
 vif(backward_model_ols)
 vif(forward_model_ols)
+confit(forward_model_ols)
 ```
 
