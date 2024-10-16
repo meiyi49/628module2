@@ -17,7 +17,7 @@
 	7. ***Residual QQ plot.png*** is a Q-Q plot showing how well the residuals align with a normal distribution from the final model, indicating whether the model's assumption of normality is reasonable.
 	8. ***Residual plot.png*** is a residual plot showing the distribution of residuals from the final model, indicating whether the model's assumption of non-linearity and heteroscedasticity is reasonable.
 	9. ***VIF for OLS Backward.png*** is a table showing the Variance Inflation Factors (VIF) for the backward selection model, which does not use weighted least squares.
-	10 ***VIF for OLS Forward.png*** is a table showing the Variance Inflation Factors (VIF) for the forward selection model, which does not use weighted least squares. This model is the final model we are chosen.
+	10. ***VIF for OLS Forward.png*** is a table showing the Variance Inflation Factors (VIF) for the forward selection model, which does not use weighted least squares. This model is the final model we are chosen.
 	11. ***choose model.png*** is a table showing the results of all the models, including MSE(LOOCV), AIC, and BIC.
 
 4. ***summary_group8.pdf*** contains the project summary.
