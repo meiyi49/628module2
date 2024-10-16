@@ -52,7 +52,7 @@ The version for these packages are shown below:
   
 ## Running the Analysis
 1. Open and run **analysis.Rmd** to perform the data cleaning, model building, and analysis.
-2. If you want to see the shiny app, use [Shiny App]([https://www.verywellhealth.com/body-fat-percentage-chart-8550202](https://uw-madison-stat628-project2-mci.shinyapps.io/stat628_project2/)).
+2. If you want to see the shiny app, use [Shiny App]([https://uw-madison-stat628-project2-mci.shinyapps.io/stat628_project2/]).
 
 ## Contact
 For any questions or inquiries about this project, feel free to contact:
