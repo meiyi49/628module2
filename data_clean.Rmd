@@ -1,0 +1,340 @@
+---
+title: "data_clean"
+output: html_document
+date: "2024-10-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# heatmap
+```{r}
+raw_data <- read.csv(file = 'BodyFat.csv',header=T)
+summary(raw_data)
+heatmap_data <- raw_data[,c('BODYFAT','DENSITY','AGE','WEIGHT','HEIGHT','ADIPOSITY','NECK','CHEST','ABDOMEN','HIP','THIGH','KNEE','ANKLE','BICEPS','FOREARM','WRIST')]
+heatmap(cor(heatmap_data))
+```
+# data cleaning
+
+## clean body fat
+
+density >= 1 
+bodyfat >= 6
+outlier 用lm预测
+```{r}
+clean_data <- raw_data[raw_data$BODYFAT >= 2 ,]
+out_data <- raw_data[ raw_data$BODYFAT <= 2,]
+
+# lm识别异常
+fat_density <- lm(BODYFAT~DENSITY,data = clean_data)
+plot(clean_data$DENSITY, clean_data$BODYFAT,xlab = 'Density', ylab = 'Body Fat',main='Density vs Bodyfat')
+abline(fat_density, col = "red") 
+
+standardized_residuals <- rstandard(fat_density)
+
+# 找出标准化残差绝对值大于2的点
+outliers <- clean_data[abs(standardized_residuals) > 2, ]
+outliers <- outliers[-3,]
+outliers$BODYFAT <- predict(fat_density,outliers)
+clean_data <- clean_data[!(clean_data$IDNO %in% outliers$IDNO),]
+clean_data <- rbind(clean_data,outliers)
+plot(clean_data$DENSITY, clean_data$BODYFAT,xlab = 'Density', ylab = 'Body Fat',main='Density vs Bodyfat')
+abline(fat_density, col = "red") 
+
+predict(fat_density,out_data)
+
+```
+
+### knn clean 
+```{r}
+
+# 提取特征和标签
+train_features <- clean_data[, -c(1, 2)]  # 训练集特征，去掉ID列和BODYFAT列
+train_labels <- clean_data$BODYFAT  # 训练集的BODYFAT值作为标签
+
+test_features <- out_data[, -c(1, 2)]  # 测试集特征，去掉ID列和BODYFAT列
+
+# 加载必要的包
+library(FNN)
+
+# 使用 KNN 回归 (k = 4)
+k <- 4
+knn_reg <- knn.reg(train = train_features, test = test_features, y = train_labels, k = k)
+
+# 将预测结果加回到 out_data 中
+out_data$Predicted_BODYFAT <- knn_reg$pred
+
+# 对 train_data 本身的预测（即自我预测）
+knn_train_reg <- knn.reg(train = train_features, test = train_features, y = train_labels, k = k)
+
+# 将预测结果加回到 clean_data 中
+clean_data$Predicted_BODYFAT <- knn_train_reg$pred
+
+```
+
+
+```{r}
+# 合并 clean_data 和 out_data，并添加来源列
+clean_data$Source <- "Normal points"
+out_data$Source <- "Outliers"
+
+# 选择我们需要的列并合并
+combined_data <- rbind(
+  clean_data[, c("BODYFAT", "Predicted_BODYFAT", "Source")],
+  out_data[, c("BODYFAT", "Predicted_BODYFAT", "Source")]
+)
+
+```
+
+```{r}
+library(ggplot2)
+
+# 绘制实际值与预测值的比较图
+ggplot(combined_data, aes(x = BODYFAT, y = Predicted_BODYFAT, color = Source)) +
+  geom_point(size = 3) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +  # 理想情况下的对角线
+  labs(title = "Actual vs Predicted BODYFAT (Outliers and Normal points)",
+       x = "Actual BODYFAT(%)",
+       y = "Predicted BODYFAT(%)") +
+  theme_minimal() +
+  scale_color_manual(values = c("Normal points" = "blue", "Outliers" = "red"))
+
+```
+
+
+```{r}
+out_data$BODYFAT <- out_data$Predicted_BODYFAT
+qced_data <- rbind(clean_data,out_data)
+qced_data <- qced_data[,c(1:17)]
+plot(qced_data$DENSITY,qced_data$BODYFAT,xlab = 'Density', ylab = 'Body Fat',main='Density vs Bodyfat')
+abline(fat_density, col = "red")
+```
+
+## bmi 互相验证
+```{r}
+qced_data$WEIGHT_inkg <- qced_data$WEIGHT / 2.2046
+qced_data$HEIGHT_inm <- 0.0254 * qced_data$HEIGHT
+
+bmi_issue <- qced_data[abs(qced_data$ADIPOSITY-qced_data$WEIGHT_inkg/qced_data$HEIGHT_inm^2)>2,]
+bmi_issue$BMI <- bmi_issue$WEIGHT_inkg/bmi_issue$HEIGHT_inm^2
+qced_data <- qced_data[!(qced_data$IDNO %in% bmi_issue$IDNO),]
+bmi_issue[1,'HEIGHT_inm'] <- sqrt(bmi_issue[1,'WEIGHT_inkg']/bmi_issue[1,'ADIPOSITY'])
+bmi_issue[2,'ADIPOSITY'] <- bmi_issue[2,'BMI']
+bmi_issue[3,'ADIPOSITY'] <- bmi_issue[3,'BMI']
+bmi_issue <- bmi_issue[,-20]
+qced_data <- rbind(qced_data,bmi_issue)
+```
+
+```{r}
+qced_data$HEIGHT_incm <- qced_data$HEIGHT_inm*100
+qced_data <- qced_data[,-c(5,6,19)]
+write.table(qced_data,file='qced_data.csv',quote=F,row.names = F,col.names = T,sep=',')
+```
+
+# Model
+
+## lasso
+
+```{r}
+```
+
+```{r}
+set.seed(42)
+library(glmnet)
+X <- as.matrix(qced_data[, -c(1,2,3)]) 
+y <- qced_data[,2]  
+
+lasso_model <- glmnet(X, y, alpha = 1)
+
+cv_lasso <- cv.glmnet(X, y, alpha = 1)
+
+best_lambda <- cv_lasso$lambda.1se
+
+plot(cv_lasso)
+
+cat("Best lambda: ", best_lambda, "\n")
+lasso_coef <- coef(cv_lasso, s = "lambda.1se")
+lasso_model <- glmnet(X, y, alpha = 1, lambda = best_lambda)
+```
+## normal lm model selection
+
+### forward 
+```{r,include=FALSE}
+data <- qced_data[,-c(1,3)]
+# Forward selection
+
+# 空模型
+null_model <- lm(BODYFAT ~ 1, data = data)
+
+# 完整模型
+full_model <- lm(BODYFAT ~ ., data = data)
+
+# 前向选择
+forward_model_ols <- step(null_model, 
+                      scope = list(lower = null_model, upper = full_model), 
+                      direction = "forward")
+summary(forward_model_ols)
+```
+
+### backward 
+```{r,include=FALSE}
+full_model <- lm(BODYFAT ~ ., data = data)
+
+# 后向选择
+backward_model_ols <- step(full_model, direction = "backward")
+summary(backward_model_ols)
+```
+
+### stepward
+```{r,include=FALSE}
+# Stepwise Selction
+# 空模型
+null_model <- lm(BODYFAT ~ 1, data = data)
+
+# 完整模型
+full_model <- lm(BODYFAT ~ ., data = data)
+
+# 逐步回归
+stepwise_model_ols <- step(null_model, 
+                       scope = list(lower = null_model, upper = full_model), 
+                       direction = "both")
+summary(stepwise_model_ols)
+
+```
+
+## weight lm model selection
+
+```{r,include=FALSE}
+popu_data<-read.csv("world_2024.csv")
+str(popu_data)
+
+popu=numeric(13)
+
+for (i in 1:13){
+  popu[i]=sum(popu_data$M[popu_data$Age >= 20+(i-1)*5 & popu_data$Age < 25+(i-1)*5])
+
+}
+
+p1=popu/sum(popu)
+p1
+```
+```{r,include=FALSE}
+raw_data=read.csv("qced_data.csv")
+
+age_groups <- cut(raw_data$AGE, breaks = seq(20, 85, by = 5), 
+                  right = FALSE,include.lowest = TRUE)
+age_g=table(age_groups)
+p2=age_g/sum(age_g)
+p2
+
+p=as.numeric(p1/p2)
+str(p)
+
+df<-raw_data
+df$w<-cut(df$AGE, breaks = seq(20,85,5), labels = p)
+df$IDNO<-NULL; df$DENSITY<-NULL
+
+```
+
+
+### forward
+
+```{r,include=FALSE}
+null_model <- lm(BODYFAT ~ 1, data = df, weights = as.numeric(w))
+
+full_model <- lm(BODYFAT ~ ., data = df, weights = as.numeric(w))
+
+forward_model_wols <- step(null_model, 
+                      scope = list(lower = null_model, upper = full_model), 
+                      direction = "forward")
+
+summary(forward_model_wols)
+```
+### backward
+```{r,include=FALSE}
+backward_model_wols <- step(full_model, 
+                       direction = "backward")
+
+summary(backward_model_wols)
+```
+
+### stepword
+```{r,include=FALSE}
+both_model_wols <- step(null_model, 
+                   scope = list(lower = null_model, upper = full_model), 
+                   direction = "both")
+
+summary(both_model_wols)
+```
+## mse
+```{r}
+n <- nrow(X)
+x <- qced_data[,-c(1,2,3)]
+y <- qced_data$BODYFAT
+lasso_predictions <- predict(lasso_model,as.matrix(x)) 
+
+#lasso adjust r2
+r2_lasso <- 1 - sum((y - lasso_predictions)^2) / sum((y - mean(y))^2)
+coef_lasso <- coef(lasso_model)
+p <- sum(coef_lasso != 0) - 1 
+n <- length(y)
+adjusted_r2_lasso <- 1 - (1 - r2_lasso) * (n - 1) / (n - p - 1)
+# lasso aic bic
+rss <- sum((y - lasso_predictions)^2)
+aic_lasso <- n * log(rss / n) + 2 * (p+1)
+bic_lasso <- n * log(rss / n) + (p+1) * log(n)
+
+b_ols <- predict(backward_model_ols,x)
+f_ols <- predict(forward_model_ols,x)
+s_ols <- predict(stepwise_model_ols,x)
+b_wols <- predict(backward_model_wols,x)
+f_wols <- predict(forward_model_wols,x)
+s_wols <- predict(both_model_wols,x)
+
+bo=summary(backward_model_ols)
+fo=summary(forward_model_ols)
+so=summary(stepwise_model_ols)
+bwo=summary(backward_model_wols)
+fwo=summary(forward_model_wols)
+swo=summary(both_model_wols)
+
+mse_lasso <- mean((y-lasso_predictions)^2)
+mse_b_ols <- mean((y-b_ols)^2)
+mse_f_ols <- mean((y - f_ols)^2)
+mse_s_ols <- mean((y - s_ols)^2)
+mse_b_wols <- mean((y - b_wols)^2)
+mse_f_wols <- mean((y - f_wols)^2)
+mse_s_wols <- mean((y - s_wols)^2)
+mse_results <- data.frame(
+  Model = c("LASSO", "OLS (Backward)", "OLS (Forward)", "OLS (Stepwise)", 
+            "Weighted OLS (Backward)", "Weighted OLS (Forward)", "Weighted OLS (Stepwise)"),
+  MSE = c(mse_lasso, mse_b_ols, mse_f_ols, mse_s_ols, 
+          mse_b_wols, mse_f_wols, mse_s_wols),
+  Adjust_r2 = c(adjusted_r2_lasso,bo$adj.r.squared,fo$adj.r.squared,so$adj.r.squared,bwo$adj.r.squared,fwo$adj.r.squared,swo$adj.r.squared),
+  AIC = c(aic_lasso, AIC(backward_model_ols),AIC(forward_model_ols),AIC(stepwise_model_ols),AIC(backward_model_wols),AIC(forward_model_wols),AIC(both_model_wols)),
+  BIC = c(bic_lasso,BIC(backward_model_ols),BIC(forward_model_ols),BIC(stepwise_model_ols),BIC(backward_model_wols),BIC(forward_model_wols),BIC(both_model_wols))
+)
+mse_results
+
+```
+```{r}
+predict(forward_model_ols,qced_data[10,],interval = 'confidence')
+qced_data[10,]
+fo
+```
+
+
+```{r}
+plot(f_ols, residuals(forward_model_ols),xlab = 'Predicted Body Fat',ylab = 'Residuals')
+abline(h=0,col='red')
+
+
+qqnorm(residuals(forward_model_ols))
+qqline(residuals(forward_model_ols),col='red')
+
+library(car)
+vif(backward_model_ols)
+vif(forward_model_ols)
+```
+
