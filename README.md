@@ -11,7 +11,7 @@
 	1. ***<picture 1.img>*** is a scatter plot with a regression line, showing the linear relationship between BODYFAT and DENSITY from the raw data.
 	2. ***<picture 2.img>*** is a scatter plot with a regression line, showing the linear relationship between BODYFAT and DENSITY from the cleaned data.
 	3. ***<picture 3.img>*** is a scatter plot showing the results of K-nearest neighbors method, used to replace the two lowest BODYFAT values.
-	4. ***<picture 4.img>*** is a table showing the results of all the models, including MSE, adjusted R-squared, AIC, and BIC.
+	4. ***<picture 4.img>*** is a table showing the results of all the models, including MSE, AIC, and BIC.
 
 4. ***summary_group8.pdf*** contains the project summary.
 
