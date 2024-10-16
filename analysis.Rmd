@@ -1,5 +1,5 @@
 ---
-title: "data_clean"
+title: "Analysis"
 output: html_document
 date: "2024-10-08"
 ---
@@ -19,21 +19,19 @@ heatmap(cor(heatmap_data))
 
 ## clean body fat
 
-density >= 1 
-bodyfat >= 6
-outlier 用lm预测
+
 ```{r}
 clean_data <- raw_data[raw_data$BODYFAT >= 2 ,]
 out_data <- raw_data[ raw_data$BODYFAT <= 2,]
 
-# lm识别异常
+
 fat_density <- lm(BODYFAT~DENSITY,data = clean_data)
 plot(clean_data$DENSITY, clean_data$BODYFAT,xlab = 'Density', ylab = 'Body Fat',main='Density vs Bodyfat')
 abline(fat_density, col = "red") 
 
 standardized_residuals <- rstandard(fat_density)
 
-# 找出标准化残差绝对值大于2的点
+
 outliers <- clean_data[abs(standardized_residuals) > 2, ]
 outliers <- outliers[-3,]
 outliers$BODYFAT <- predict(fat_density,outliers)
@@ -49,37 +47,37 @@ predict(fat_density,out_data)
 ### knn clean 
 ```{r}
 
-# 提取特征和标签
-train_features <- clean_data[, -c(1, 2)]  # 训练集特征，去掉ID列和BODYFAT列
-train_labels <- clean_data$BODYFAT  # 训练集的BODYFAT值作为标签
 
-test_features <- out_data[, -c(1, 2)]  # 测试集特征，去掉ID列和BODYFAT列
+train_features <- clean_data[, -c(1, 2)]
+train_labels <- clean_data$BODYFAT 
 
-# 加载必要的包
+test_features <- out_data[, -c(1, 2)]  
+
+
 library(FNN)
 
-# 使用 KNN 回归 (k = 4)
+
 k <- 4
 knn_reg <- knn.reg(train = train_features, test = test_features, y = train_labels, k = k)
 
-# 将预测结果加回到 out_data 中
+
 out_data$Predicted_BODYFAT <- knn_reg$pred
 
-# 对 train_data 本身的预测（即自我预测）
+
 knn_train_reg <- knn.reg(train = train_features, test = train_features, y = train_labels, k = k)
 
-# 将预测结果加回到 clean_data 中
+
 clean_data$Predicted_BODYFAT <- knn_train_reg$pred
 
 ```
 
 
 ```{r}
-# 合并 clean_data 和 out_data，并添加来源列
+
 clean_data$Source <- "Normal points"
 out_data$Source <- "Outliers"
 
-# 选择我们需要的列并合并
+
 combined_data <- rbind(
   clean_data[, c("BODYFAT", "Predicted_BODYFAT", "Source")],
   out_data[, c("BODYFAT", "Predicted_BODYFAT", "Source")]
@@ -90,10 +88,10 @@ combined_data <- rbind(
 ```{r}
 library(ggplot2)
 
-# 绘制实际值与预测值的比较图
+
 ggplot(combined_data, aes(x = BODYFAT, y = Predicted_BODYFAT, color = Source)) +
   geom_point(size = 3) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +  # 理想情况下的对角线
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") + 
   labs(title = "Actual vs Predicted BODYFAT (Outliers and Normal points)",
        x = "Actual BODYFAT(%)",
        y = "Predicted BODYFAT(%)") +
@@ -111,7 +109,7 @@ plot(qced_data$DENSITY,qced_data$BODYFAT,xlab = 'Density', ylab = 'Body Fat',mai
 abline(fat_density, col = "red")
 ```
 
-## bmi 互相验证
+
 ```{r}
 qced_data$WEIGHT_inkg <- qced_data$WEIGHT / 2.2046
 qced_data$HEIGHT_inm <- 0.0254 * qced_data$HEIGHT
@@ -164,13 +162,12 @@ lasso_model <- glmnet(X, y, alpha = 1, lambda = best_lambda)
 data <- qced_data[,-c(1,3)]
 # Forward selection
 
-# 空模型
+
 null_model <- lm(BODYFAT ~ 1, data = data)
 
-# 完整模型
+
 full_model <- lm(BODYFAT ~ ., data = data)
 
-# 前向选择
 forward_model_ols <- step(null_model, 
                       scope = list(lower = null_model, upper = full_model), 
                       direction = "forward")
@@ -181,7 +178,7 @@ summary(forward_model_ols)
 ```{r,include=FALSE}
 full_model <- lm(BODYFAT ~ ., data = data)
 
-# 后向选择
+
 backward_model_ols <- step(full_model, direction = "backward")
 summary(backward_model_ols)
 ```
@@ -189,13 +186,13 @@ summary(backward_model_ols)
 ### stepward
 ```{r,include=FALSE}
 # Stepwise Selction
-# 空模型
+
 null_model <- lm(BODYFAT ~ 1, data = data)
 
-# 完整模型
+
 full_model <- lm(BODYFAT ~ ., data = data)
 
-# 逐步回归
+
 stepwise_model_ols <- step(null_model, 
                        scope = list(lower = null_model, upper = full_model), 
                        direction = "both")
