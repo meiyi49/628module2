@@ -8,7 +8,7 @@ This repository contains the data, code, and analysis for the project on body fa
 This folder contains the raw and cleaned datasets used in the analysis:
 1. **body_fat.csv**: Contains the raw body fat data.
 2. **qted.csv**: Contains the cleaned data with corrected values for BODYFAT, HEIGHT, and ADIPOSITY.
-3.  **world_2024.csv**: Contains body fat percentage data by age and gender, sourced from [Verywell Health](https://www.verywellhealth.com/body-fat-percentage-chart-8550202).
+3. **world_2024.csv**: Contains body fat percentage data by age and gender, sourced from [Verywell Health](https://www.verywellhealth.com/body-fat-percentage-chart-8550202).
 
 ### 2. Code Folder
 This folder contains the code for data cleaning, analysis, and building the Shiny app:
@@ -54,13 +54,11 @@ The version for these packages are shown below:
 1. Open and run **analysis.Rmd** to perform the data cleaning, model building, and analysis.
 2. If you want to see the shiny app, use [Shiny App]([https://www.verywellhealth.com/body-fat-percentage-chart-8550202](https://uw-madison-stat628-project2-mci.shinyapps.io/stat628_project2/)).
 
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
 ## Contact
 For any questions or inquiries about this project, feel free to contact:
 - **Meiyi Yan**: myan49@wisc.edu
-- **Siyu Wang**: 
+- **Siyu Wang**: swang2379@wisc.edu
+- **Minyuan Zhao**: mzhao246@wisc.edu
 
 ## Acknowledgements
 We would like to thank all contributors and open-source libraries used in this project.
