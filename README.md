@@ -6,14 +6,14 @@ This repository contains the data, code, and analysis for the project on body fa
 
 ### 1. Data Folder
 This folder contains the raw and cleaned datasets used in the analysis:
-- **body_fat.csv**: Contains the raw body fat data.
-- **qted.csv**: Contains the cleaned data with corrected values for BODYFAT, HEIGHT, and ADIPOSITY.
-- **world_2024.csv**: Contains body fat percentage data by age and gender, sourced from [Verywell Health](https://www.verywellhealth.com/body-fat-percentage-chart-8550202).
+1. **body_fat.csv**: Contains the raw body fat data.
+2. **qted.csv**: Contains the cleaned data with corrected values for BODYFAT, HEIGHT, and ADIPOSITY.
+3.  **world_2024.csv**: Contains body fat percentage data by age and gender, sourced from [Verywell Health](https://www.verywellhealth.com/body-fat-percentage-chart-8550202).
 
 ### 2. Code Folder
 This folder contains the code for data cleaning, analysis, and building the Shiny app:
-- **analysis.Rmd**: R Markdown file with data cleaning and model building code.
-- **app.R**: The base code for the Shiny app used in the project.
+1. **analysis.Rmd**: R Markdown file with data cleaning and model building code.
+2. **app.R**: The base code for the Shiny app used in the project.
 
 ### 3. Image Folder
 This folder contains plots, tables, and figures generated from the analysis:
