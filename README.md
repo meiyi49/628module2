@@ -8,10 +8,17 @@
 	2. ***app.R*** contains Shiny base code. 
 
 3. For the image folder:
-	1. ***<picture 1.img>*** is a scatter plot with a regression line, showing the linear relationship between BODYFAT and DENSITY from the raw data.
-	2. ***<picture 2.img>*** is a scatter plot with a regression line, showing the linear relationship between BODYFAT and DENSITY from the cleaned data.
-	3. ***<picture 3.img>*** is a scatter plot showing the results of K-nearest neighbors method, used to replace the two lowest BODYFAT values.
-	4. ***<picture 4.img>*** is a table showing the results of all the models, including MSE, AIC, and BIC.
+	1. ***Age Distribution of Sample.png*** is a histogram plot showing the distribution of age from the raw data(***body_fat.csv***).
+	2. ***Age Distribution of World 2024.png*** is a histogram plot showing the distribution of age from ***world_2024.csv***.
+	3. ***Bodyfat vs Density After Imputation.png*** is a scatter plot with a regression line, showing the linear relationship between BODYFAT and DENSITY from the cleaned data(***qted.csv***).
+	4. ***Bodyfat vs Density Before Imputation.png*** is a scatter plot with a regression line, showing the linear relationship between BODYFAT and DENSITY from the raw data(***body_fat.csv***).
+	5. ***Hypothesis Testing Results.png*** is a table showing the results of t-test and F-test from the final model.
+	6. ***KNN Imputation.png*** is a scatter plot showing the difference between the actual BODYFAT from the raw data(***body_fat.csv***) and the predicted BODYFAT using KNN. 
+	7. ***Residual QQ plot.png*** is a Q-Q plot showing how well the residuals align with a normal distribution from the final model, indicating whether the model's assumption of normality is reasonable.
+	8. ***Residual plot.png*** is a residual plot showing the distribution of residuals from the final model, indicating whether the model's assumption of non-linearity and heteroscedasticity is reasonable.
+	9. ***VIF for OLS Backward.png*** is a table showing the Variance Inflation Factors (VIF) for the backward selection model, which does not use weighted least squares.
+	10 ***VIF for OLS Forward.png*** is a table showing the Variance Inflation Factors (VIF) for the forward selection model, which does not use weighted least squares. This model is the final model we are chosen.
+	11. ***choose model.png*** is a table showing the results of all the models, including MSE(LOOCV), AIC, and BIC.
 
 4. ***summary_group8.pdf*** contains the project summary.
 
