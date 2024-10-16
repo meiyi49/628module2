@@ -165,7 +165,7 @@ server <- function(input, output) {
     
     # Make predictions using the fitted model
     predicted_value <- predict(fitted_model, newdata = new_data)  # Predict values using pre-fitted model
-    output$prediction_result <- renderText(paste("The predicted BODYFAT value is:", round(predicted_value, 2)))  # Display the prediction result
+    output$prediction_result <- renderText(paste("The predicted BODYFAT value is:", round(predicted_value, 2), "%"))  # Display the prediction result
   })
   
   # Define the body fat percentage table
