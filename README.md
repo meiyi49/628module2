@@ -38,25 +38,29 @@ This folder contains plots, tables, and figures generated from the analysis:
 ## How to Use the Code
 
 ### Prerequisites
-Make sure you have R and the necessary packages installed (e.g., `ggplot2`, `shiny`, `dplyr`). You can install missing packages with the following command:
+Make sure you have R and the necessary packages installed `FNN`, `ggplot`, `glmnet`, `car`, `shiny`. You can install missing packages with the following command:
 
 ```r
-install.packages(c("ggplot2", "shiny", "dplyr"))
+install.packages(c("FNN", "ggplot", "glmnet", "car", "shiny"))
 ```
+The version for these packages are shown below:
+- FNN >= 1.1.4.1
+- ggplot >= 2 3.5.1
+- glmnet >= 4.1.8
+- car >= 3.1.2
+- shiny >= 1.9.1
+  
 ## Running the Analysis
 1. Open and run **analysis.Rmd** to perform the data cleaning, model building, and analysis.
-2. Use **app.R** to run the Shiny app that interacts with the data and allows users to explore the results visually.
+2. If you want to see the shiny app, use [Shiny App]([https://www.verywellhealth.com/body-fat-percentage-chart-8550202](https://uw-madison-stat628-project2-mci.shinyapps.io/stat628_project2/)).
 
-```r
-# Running the Shiny app
-shiny::runApp("app.R")
-```
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ## Contact
 For any questions or inquiries about this project, feel free to contact:
-- **Your Name**: your-email@example.com
+- **Meiyi Yan**: myan49@wisc.edu
+- **Siyu Wang**: 
 
 ## Acknowledgements
 We would like to thank all contributors and open-source libraries used in this project.
